@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>API Rate Limiter Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body style="font-family: Arial; text-align: center;">
+
+<h2>API Rate Limiter Dashboard</h2>
+
+<input type="text" id="apiKey" placeholder="Enter API Key" />
+<button onclick="sendRequest()">Send Request</button>
+
+<p id="result"></p>
+
+<canvas id="chart" width="400" height="200"></canvas>
+
+<script>
+
+    let successCount = 0;
+    let failCount = 0;
+
+    function sendRequest() {
+
+        let apiKey = document.getElementById("apiKey").value.trim();
+
+        if (!apiKey) {
+            document.getElementById("result").innerText = "❌ Enter API Key first";
+            return;
+        }
+
+        fetch("/test", {   // ✅ IMPORTANT (no localhost here)
+            method: "GET",
+            headers: {
+                "API_KEY": apiKey
+            }
+        })
+        .then(response => response.text().then(text => ({
+            status: response.status,
+            body: text
+        })))
+        .then(data => {
+
+            if (data.status === 200) {
+                successCount++;
+                document.getElementById("result").innerText = "✅ " + data.body;
+            } else {
+                failCount++;
+                document.getElementById("result").innerText = "❌ " + data.body;
+            }
+
+            updateChart();
+        })
+        .catch(error => {
+            console.log(error);
+            document.getElementById("result").innerText = "❌ Error connecting to server";
+        });
+    }
+
+    let chart = new Chart(document.getElementById("chart"), {
+        type: 'bar',
+        data: {
+            labels: ["Success", "Blocked"],
+            datasets: [{
+                label: "Requests",
+                data: [0, 0]
+            }]
+        }
+    });
+
+    function updateChart() {
+        chart.data.datasets[0].data = [successCount, failCount];
+        chart.update();
+    }
+
+</script>
+
+</body>
+</html>
