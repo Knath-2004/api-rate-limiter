@@ -39,10 +39,3 @@ A backend-driven API Rate Limiting system built using **Spring Boot**, with a si
 5. If valid → request processed  
 6. If not → blocked with error  
 7. Dashboard updates graph dynamically  
-
----
-
-## 📷 Demo
-
-👉 Open in browser:
-http://localhost:8080/dashboard.html
